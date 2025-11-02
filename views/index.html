@@ -219,10 +219,13 @@
             <div class="list-container" style="margin-top:12px">
                 <h2 id="dayLabel">Seleccione un día</h2>
                 <div id="dayTimeline" class="day-timeline">
-                    <!-- timeline header (hours) -->
-                    <div class="timeline-header" id="timelineHeader"></div>
-                    <!-- rows: one per technician -->
-                    <div class="timeline-rows" id="timelineRows"></div>
+                    <!-- Este div es clave para el scroll horizontal en móviles -->
+                    <div class="timeline-wrapper">
+                        <!-- timeline header (hours) -->
+                        <div class="timeline-header" id="timelineHeader"></div>
+                        <!-- rows: one per technician -->
+                        <div class="timeline-rows" id="timelineRows"></div>
+                    </div>
                 </div>
             </div>
         </div>

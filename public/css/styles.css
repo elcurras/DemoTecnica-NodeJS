@@ -133,6 +133,8 @@ button:active{transform:translateY(0)}
     margin-bottom: 24px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 12px;
+    /* Para móvil: permite scroll horizontal si las pestañas no caben */
+    overflow-x: auto;
 }
 
 .tab-button {
@@ -213,12 +215,10 @@ button:active{transform:translateY(0)}
 .sede-item .capacity-table {
     margin-top: 12px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     padding: 8px;
-    background: rgba(0,0,0,0.1);
-    border-radius: 6px;
-    font-size: 0.9rem;
+    /* SOLUCIÓN RESPONSIVA: Las columnas se ajustan automáticamente al espacio disponible */
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
 }
 
 .sede-item .day-capacity {
@@ -278,7 +278,7 @@ textarea {
 .mc-weekdays .mc-cell { font-weight:600; color:var(--muted); text-align:center; padding:6px 8px; }
 .mc-cell { box-sizing:border-box; flex:1; border-radius:6px; padding:8px; min-height:70px; position:relative; margin:4px; background:transparent; }
 .mc-empty { background:transparent; }
-.mc-day { cursor:pointer; border:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.008), rgba(0,0,0,0.05)); }
+.mc-day { cursor:pointer; border:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.008), rgba(0,0,0,0.05)); transition: transform 0.15s, box-shadow 0.15s; }
 .mc-day:hover { box-shadow:0 6px 16px rgba(0,0,0,0.6); transform:translateY(-2px); }
 .mc-day.selected { outline:3px solid rgba(59,130,246,0.18); }
 .mc-day .mc-day-num { font-weight:600; }
@@ -371,6 +371,15 @@ textarea {
   border-right: 1px dashed rgba(255,255,255,0.02);
 }
 
+/* Contenedor para hacer el timeline deslizable en móvil */
+.timeline-wrapper {
+    width: 100%;
+    overflow-x: auto; /* La magia del scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
 /* Estilos para la línea de tiempo del día */
 .tr-row {
   border-bottom: 1px solid var(--border);
@@ -410,13 +419,24 @@ textarea {
 
 /* responsive */
 @media (max-width:800px) {
-  .tr-label { display:none; }
-  .tr-cells { min-width: 200px; }
+  /* Forzamos un ancho mínimo al contenido del timeline para que se active el scroll del wrapper */
+  .timeline-header, .tr-row {
+      min-width: 800px;
+  }
+  /* Quitamos bordes que ahora gestiona el wrapper */
+  .tr-row {
+      border-bottom: none;
+  }
+  .tr-row:not(:last-child) {
+      border-bottom: 1px solid var(--border);
+  }
 }
 
 @media (max-width:640px){
   .container{padding:16px}
   .form-container, .list-container{padding:14px}
+  h1 { font-size: 1.5rem; }
+  .mc-cell { padding: 4px; min-height: 60px; } /* Celdas del calendario más compactas */
 }
 
 /* Incidencias */
@@ -451,6 +471,7 @@ textarea {
     margin-top: 8px;
     font-size: 0.9rem;
     color: var(--muted);
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan en vez de desbordar */
 }
 
 .incidencia-actions {
@@ -534,6 +555,14 @@ select:focus {
     gap: 12px;
     align-items: center;
     margin-bottom: 16px;
+}
+/* En pantallas pequeñas, apilamos la etiqueta y el select para mejor legibilidad */
+@media (max-width: 640px) {
+    .select-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
 }
 
 .select-group label {
