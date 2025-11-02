@@ -1,0 +1,19 @@
+{
+  "name": "prueba-node",
+  "version": "1.0.0",
+  "description": "aprendiendo node",
+  "main": "index.js",
+  "scripts": {
+    "start": " nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alejandro Villar",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

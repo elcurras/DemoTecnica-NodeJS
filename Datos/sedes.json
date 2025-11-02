@@ -1,0 +1,53 @@
+{
+  "sedes": [
+    {
+      "id": "s_1",
+      "nombre": "Sede Centro 1",
+      "direccion": "Calle Falsa 123",
+      "tecnicos": [],
+      "capacidad": {
+        "lun": 8,
+        "mar": 8,
+        "mie": 8,
+        "jue": 8,
+        "vie": 8
+      },
+      "activa": true,
+      "createdAt": "2025-10-26T19:52:35.968Z",
+      "notas": "",
+      "updatedAt": "2025-10-26T22:19:09.456Z"
+    },
+    {
+      "id": "s_2",
+      "nombre": "Sede Centro 2",
+      "direccion": "Calle Falsa 123",
+      "tecnicos": [],
+      "capacidad": {
+        "lun": 8,
+        "mar": 8,
+        "mie": 8,
+        "jue": 8,
+        "vie": 8
+      },
+      "activa": true,
+      "createdAt": "2025-10-26T19:52:35.968Z",
+      "notas": ""
+    },
+    {
+      "id": "s_mhc8g5eb",
+      "nombre": "Sede 3",
+      "direccion": "lkjasghdklajsgd",
+      "tecnicos": [],
+      "capacidad": {
+        "lun": 5,
+        "mar": 8,
+        "mie": 5,
+        "jue": 8,
+        "vie": 8
+      },
+      "activa": true,
+      "createdAt": "2025-10-29T16:51:34.355Z",
+      "notas": ""
+    }
+  ]
+}

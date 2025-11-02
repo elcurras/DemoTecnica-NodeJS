@@ -1,0 +1,45 @@
+{
+  "tecnicos": [
+    {
+      "nombre": "Tecnico 3",
+      "horario": "08:00 - 17:00",
+      "sedeId": "s_1",
+      "id": "3",
+      "activo": true,
+      "createdAt": "2025-10-26T19:52:35.968Z"
+    },
+    {
+      "nombre": "Tecnico 2",
+      "horario": "08:00 - 17:00",
+      "sedeId": "s_2",
+      "id": "2",
+      "activo": true,
+      "createdAt": "2025-10-26T19:52:35.968Z"
+    },
+    {
+      "id": "1",
+      "activo": true,
+      "horario": "08:00 - 17:00",
+      "sedeId": "s_2",
+      "createdAt": "2025-10-26T22:25:14.675Z",
+      "nombre": "Tecnico 1",
+      "updatedAt": "2025-10-28T12:49:39.603Z"
+    },
+    {
+      "id": "t_mhc8fs4d_163",
+      "activo": true,
+      "horario": "08:00-17:00",
+      "sedeId": "s_2",
+      "createdAt": "2025-10-29T16:51:17.149Z",
+      "nombre": "Andres"
+    },
+    {
+      "id": "t_mhc8h4fq_656",
+      "activo": true,
+      "horario": "08:00-17:00",
+      "sedeId": "s_mhc8g5eb",
+      "createdAt": "2025-10-29T16:52:19.766Z",
+      "nombre": "Andres 2"
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Técnicos</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Gestión</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="tecnicos">Técnicos</button>
+            <button class="tab-button" data-tab="sedes">Sedes</button>
+            <button class="tab-button" data-tab="incidencias">Incidencias</button>
+            <button class="tab-button" data-tab="calendario">Calendario</button>
+            <button class="tab-button" data-tab="import-export">Importar/Exportar</button>
+        </div>
+
+        <!-- Módulo Técnicos -->
+        <div class="tab-content active" id="tecnicos-tab">
+            <div class="form-container">
+                <!-- Existing técnicos form -->
+                <h2>Agregar Nuevo Técnico</h2>
+                <form id="tecnicoForm" action="javascript:void(0);">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horario">Horario (ej. 08:00 - 17:00):</label>
+                        <input type="text" id="horario" placeholder="08:00 - 17:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="sedeId">Sede:</label>
+                        <select id="sedeId" required>
+                            <option value="">Mostrar sin sede / seleccionar</option>
+                        </select>
+                    </div>
+                    <button type="submit">Agregar Técnico</button>
+                </form>
+            </div>
+
+            <div class="list-container">
+                <!-- Existing técnicos list -->
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+                    <div>
+                        <label for="filterSede" style="color:var(--muted)">Filtrar por sede</label><br>
+                        <select id="filterSede">
+                            <option value="all">Mostrar todos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sortBy" style="color:var(--muted)">Ordenar por</label><br>
+                        <select id="sortBy">
+                            <option value="nombre_asc">Nombre ↑</option>
+                            <option value="nombre_desc">Nombre ↓</option>
+                        </select>
+                    </div>
+                    <div style="margin-left:auto;color:var(--muted)" id="contador"></div>
+                </div>
+                <h2>Lista de Técnicos</h2>
+                <div id="tecnicosList"></div>
+            </div>
+        </div>
+
+        <!-- Módulo Sedes -->
+        <div class="tab-content" id="sedes-tab">
+            <div class="form-container">
+                <h2>Agregar Nueva Sede</h2>
+                <form id="sedeForm" action="javascript:void(0);">
+                    <div class="form-group">
+                        <label for="nombreSede">Nombre:</label>
+                        <input type="text" id="nombreSede" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="direccionSede">Dirección:</label>
+                        <input type="text" id="direccionSede" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Capacidad por día:</label>
+                        <div class="capacity-grid">
+                            <div class="capacity-day">
+                                <label for="cap_lun">Lunes</label>
+                                <input type="number" id="cap_lun" min="0" max="24" value="8">
+                            </div>
+                            <div class="capacity-day">
+                                <label for="cap_mar">Martes</label>
+                                <input type="number" id="cap_mar" min="0" max="24" value="8">
+                            </div>
+                            <div class="capacity-day">
+                                <label for="cap_mie">Miércoles</label>
+                                <input type="number" id="cap_mie" min="0" max="24" value="8">
+                            </div>
+                            <div class="capacity-day">
+                                <label for="cap_jue">Jueves</label>
+                                <input type="number" id="cap_jue" min="0" max="24" value="8">
+                            </div>
+                            <div class="capacity-day">
+                                <label for="cap_vie">Viernes</label>
+                                <input type="number" id="cap_vie" min="0" max="24" value="8">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notasSede">Notas:</label>
+                        <textarea id="notasSede" rows="2"></textarea>
+                    </div>
+                    <button type="submit">Agregar Sede</button>
+                </form>
+            </div>
+
+            <div class="list-container">
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+                    <div>
+                        <label for="sortSedes" style="color:var(--muted)">Ordenar por</label><br>
+                        <select id="sortSedes">
+                            <option value="nombre_asc">Nombre ↑</option>
+                            <option value="nombre_desc">Nombre ↓</option>
+                        </select>
+                    </div>
+                    <div style="margin-left:auto;color:var(--muted)" id="contadorSedes"></div>
+                </div>
+                <h2>Lista de Sedes</h2>
+                <div id="sedesList"></div>
+            </div>
+        </div>
+
+        <!-- Módulo Incidencias -->
+        <div class="tab-content" id="incidencias-tab">
+            <div class="form-container">
+                <h2>Registro de Incidencia</h2>
+                <form id="incidenciaForm">
+                    <div class="form-group">
+                        <label for="tituloInc">Título:</label>
+                        <input type="text" id="tituloInc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcionInc">Descripción:</label>
+                        <textarea id="descripcionInc" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="sedeIncId">Sede:</label>
+                        <select id="sedeIncId" required>
+                            <option value="">Seleccionar sede</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prioridadInc">Prioridad:</label>
+                        <select id="prioridadInc" required>
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duracionInc">Duración Estimada (horas):</label>
+                        <input type="number" id="duracionInc" step="0.5" min="0.5" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaLimiteInc">Fecha Límite (opcional):</label>
+                        <input type="datetime-local" id="fechaLimiteInc">
+                    </div>
+                    <button type="submit">Registrar Incidencia</button>
+                </form>
+            </div>
+
+            <div class="list-container">
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+                    <div>
+                        <label for="filterIncEstado" style="color:var(--muted)">Estado</label><br>
+                        <select id="filterIncEstado">
+                            <option value="all" selected>Todos</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="asignada">Asignadas</option>
+                            <option value="cancelada">Canceladas</option>
+                            <option value="completada">Completadas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filterIncSede" style="color:var(--muted)">Sede</label><br>
+                        <select id="filterIncSede">
+                            <option value="all">Todas</option>
+                        </select>
+                    </div>
+                    <div style="margin-left:auto;color:var(--muted)" id="contadorInc"></div>
+                </div>
+
+                <h2>Lista de Incidencias</h2>
+                <div id="incidenciasList"></div>
+            </div>
+        </div>
+
+        <!-- Módulo Calendario -->
+        <div class="tab-content" id="calendario-tab">
+            <div class="form-container">
+                <div style="display:flex;gap:12px;align-items:center">
+                    <div>
+                        <label for="calSede" style="color:var(--muted)">Sede</label><br>
+                        <select id="calSede">
+                            <option value="all">Todas</option>
+                        </select>
+                    </div>
+                    <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+                        <button id="prevMonth" type="button">&larr; Mes</button>
+                        <div id="calMonthLabel" style="font-weight:600;color:var(--text)"></div>
+                        <button id="toggleCalendar" type="button" class="secondary" style="display:none;">Mostrar Calendario</button>
+                        <button id="nextMonth" type="button">Mes &rarr;</button>
+                        <button id="btnAutoAsignar" type="button" style="background:var(--accent-2)" disabled>Auto-Asignar</button>
+                    </div>
+                </div>
+                <div style="margin-top:12px">
+                    <div id="monthCalendar" class="month-calendar"></div>
+                </div>
+            </div>
+
+            <div class="list-container" style="margin-top:12px">
+                <h2 id="dayLabel">Seleccione un día</h2>
+                <div id="dayTimeline" class="day-timeline">
+                    <!-- timeline header (hours) -->
+                    <div class="timeline-header" id="timelineHeader"></div>
+                    <!-- rows: one per technician -->
+                    <div class="timeline-rows" id="timelineRows"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Módulo Importar/Exportar -->
+        <div class="tab-content" id="import-export-tab">
+            <!-- Técnicos -->
+            <div class="form-container">
+                <h2>Técnicos</h2>
+                <p>Exporta los datos de los técnicos a un archivo `tecnicos.json` o importa un archivo para reemplazarlos.</p>
+                <form class="import-form" data-module="tecnicos">
+                    <button type="button" class="export-btn" data-module="tecnicos">Exportar Técnicos</button>
+                    <div class="form-group">
+                        <input type="file" accept=".json" required>
+                        <button type="submit">Importar Técnicos</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sedes -->
+            <div class="form-container">
+                <h2>Sedes</h2>
+                <p>Exporta los datos de las sedes a un archivo `sedes.json` o importa un archivo para reemplazarlas.</p>
+                <form class="import-form" data-module="sedes">
+                    <button type="button" class="export-btn" data-module="sedes">Exportar Sedes</button>
+                    <div class="form-group">
+                        <input type="file" accept=".json" required>
+                        <button type="submit">Importar Sedes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Incidencias -->
+            <div class="form-container">
+                <h2>Incidencias</h2>
+                <p>Exporta los datos de las incidencias a un archivo `incidencias.json` o importa un archivo para reemplazarlas.</p>
+                <form class="import-form" data-module="incidencias">
+                    <button type="button" class="export-btn" data-module="incidencias">Exportar Incidencias</button>
+                    <div class="form-group">
+                        <input type="file" accept=".json" required>
+                        <button type="submit">Importar Incidencias</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Copia de Seguridad y Limpieza -->
+            <div class="form-container">
+                <h2>Copia de Seguridad y Limpieza</h2>
+                <p>Guarda una copia de seguridad de todos los datos en un único archivo o elimina todos los datos de la aplicación (acción irreversible).</p>
+                <div class="form-group">
+                    <button id="btnBackup" type="button">Guardar Copia de Seguridad</button>
+                    <button id="btnCleanData" type="button" style="background:var(--danger); margin-left: 8px;">Limpiar Todos los Datos</button>
+                </div>
+                <form id="restoreBackupForm" style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                    <p>Restaura la aplicación desde un archivo `backup.json`. <strong>Atención:</strong> Esto sobrescribirá todos los datos existentes.</p>
+                    <div class="form-group">
+                        <input type="file" id="backupFile" accept=".json" required>
+                        <button type="submit">Cargar Copia de Seguridad</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/js/main.js"></script>
+</body>
+</html>
