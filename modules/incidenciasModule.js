@@ -152,14 +152,18 @@ async function autoAsignarIncidencias(sedeId, fecha) {
     const jornadaFin = 18;   // 6:00 PM
 
     // 1. Obtener datos necesarios
-    const todasIncidencias = await getIncidencias();
+    const todasIncidencias = await getIncidencias(); // Ya se obtienen todas
     const todosTecnicos = await tecnicosModule.getTecnicos();
     const todosEventos = calendarioModule.getEventosFromIncidencias(todasIncidencias);
 
-    // 2. Filtrar datos para la sede y fecha
-    const incidenciasPendientes = todasIncidencias.filter(inc =>
-        inc.sedeId === sedeId &&
-        (inc.estado === 'pendiente' || inc.estado === 'programada' && !inc.tecnicoId)
+    // 2. Filtrar incidencias que están programadas para el día seleccionado y no tienen técnico.
+    const diaInicioFiltro = new Date(fechaObj.getFullYear(), fechaObj.getMonth(), fechaObj.getDate(), 0, 0, 0);
+    const diaFinFiltro = new Date(fechaObj.getFullYear(), fechaObj.getMonth(), fechaObj.getDate(), 23, 59, 59, 999);
+
+    const incidenciasAAsignar = todasIncidencias.filter(inc =>
+        inc.estado === 'programada' &&
+        !inc.tecnicoId &&
+        new Date(inc.fechaInicio) >= diaInicioFiltro && new Date(inc.fechaInicio) <= diaFinFiltro
     ).sort((a, b) => { // Priorizar por 'alta' y luego por fecha de creación
         const priorityMap = { alta: 3, media: 2, baja: 1 };
         const priorityA = priorityMap[a.prioridad] || 0;
@@ -168,11 +172,11 @@ async function autoAsignarIncidencias(sedeId, fecha) {
         return new Date(a.createdAt) - new Date(b.createdAt);
     });
 
-    const tecnicosSede = todosTecnicos.filter(t => t.sedeId === sedeId && t.activo !== false);
+    const tecnicosActivos = todosTecnicos.filter(t => t.activo !== false);
 
     // 3. Construir mapa de disponibilidad de técnicos
     const disponibilidadTecnicos = {};
-    tecnicosSede.forEach(tec => {
+    tecnicosActivos.forEach(tec => {
         disponibilidadTecnicos[tec.id] = []; // Array de huecos ocupados [inicio, fin]
     });
 
@@ -193,18 +197,29 @@ async function autoAsignarIncidencias(sedeId, fecha) {
     const asignadas = [];
     const noAsignadas = [];
     let lastTecnicoIndex = 0;
+    const lastTecnicoIndexPorSede = {}; // Para Round Robin por sede
 
-    for (const inc of incidenciasPendientes) {
+    for (const inc of incidenciasAAsignar) {
         let asignada = false;
         const duracionHoras = inc.duracionEstimadaHoras || 1;
+        const tecnicosDeLaSedeIncidencia = tecnicosActivos.filter(t => t.sedeId === inc.sedeId);
+        if (tecnicosDeLaSedeIncidencia.length === 0) continue; // No hay técnicos para esta sede, saltar incidencia
 
-        // Búsqueda rotativa de técnico (Round Robin)
-        for (let i = 0; i < tecnicosSede.length; i++) {
-            const tecIndex = (lastTecnicoIndex + i) % tecnicosSede.length;
-            const tecnico = tecnicosSede[tecIndex];
+        // Búsqueda rotativa de técnico (Round Robin) dentro de la sede de la incidencia
+        const startIndex = lastTecnicoIndexPorSede[inc.sedeId] || 0;
+        for (let i = 0; i < tecnicosDeLaSedeIncidencia.length; i++) {
+            const tecIndex = (startIndex + i) % tecnicosDeLaSedeIncidencia.length;
+            const tecnico = tecnicosDeLaSedeIncidencia[tecIndex];
             const huecosOcupados = disponibilidadTecnicos[tecnico.id].sort((a, b) => a.inicio - b.inicio);
 
-            let proximoHuecoLibre = new Date(fechaObj.setHours(jornadaInicio, 0, 0, 0));
+            const inicioJornada = new Date(fechaObj.getFullYear(), fechaObj.getMonth(), fechaObj.getDate(), jornadaInicio, 0, 0);
+            let proximoHuecoLibre = new Date(inicioJornada);
+
+            // Si la incidencia está programada, usamos esa hora como punto de partida,
+            // pero solo si es posterior al inicio de la jornada.
+            if (inc.estado === 'programada' && inc.fechaInicio) {
+                proximoHuecoLibre = new Date(Math.max(inicioJornada.getTime(), new Date(inc.fechaInicio).getTime()));
+            }
 
             for (const hueco of huecosOcupados) {
                 if (proximoHuecoLibre.getTime() + duracionHoras * 3600000 <= hueco.inicio.getTime()) {
@@ -214,11 +229,11 @@ async function autoAsignarIncidencias(sedeId, fecha) {
             }
 
             const finCitaPropuesta = new Date(proximoHuecoLibre.getTime() + duracionHoras * 3600000);
-            if (finCitaPropuesta.getHours() <= jornadaFin) {
+            if (finCitaPropuesta.getTime() <= new Date(fechaObj.getFullYear(), fechaObj.getMonth(), fechaObj.getDate(), jornadaFin, 0, 0).getTime()) {
                 const incidenciaAsignada = await asignarIncidencia(inc.id, { tecnicoId: tecnico.id, fechaInicio: proximoHuecoLibre.toISOString() });
                 asignadas.push(incidenciaAsignada);
                 disponibilidadTecnicos[tecnico.id].push({ inicio: proximoHuecoLibre, fin: finCitaPropuesta });
-                lastTecnicoIndex = (tecIndex + 1) % tecnicosSede.length; // Siguiente técnico para la próxima incidencia
+                lastTecnicoIndexPorSede[inc.sedeId] = (tecIndex + 1) % tecnicosDeLaSedeIncidencia.length; // Siguiente técnico para la próxima incidencia en ESTA sede
                 asignada = true;
                 break; // Pasamos a la siguiente incidencia
             }

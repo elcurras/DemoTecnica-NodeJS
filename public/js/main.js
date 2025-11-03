@@ -57,8 +57,10 @@ function renderTecnicosFromCache() {
     const sortBy = document.getElementById('sortBy')?.value || 'nombre_asc';
 
     let items = _tecnicosCache.slice();
-    if (filterSede !== 'all') {
-        items = items.filter(t => (t.sedeId || null) === filterSede);
+    if (filterSede === 'sin_sede') {
+        items = items.filter(t => !t.sedeId);
+    } else if (filterSede !== 'all') {
+        items = items.filter(t => t.sedeId === filterSede);
     }
 
     items.sort((a, b) => {
@@ -110,13 +112,12 @@ function renderIncidenciasList() {
     
     // Apply filters
     if (filterEstado !== 'all') {
-        items = items.filter(i => {
-            // handle both 'abierta' and 'pendiente' states
-            if (filterEstado === 'pendiente') {
-                return !i.estado || i.estado === 'pendiente' || i.estado === 'abierta';
-            }
-            return i.estado === filterEstado;
-        });
+        if (filterEstado === 'pendiente') {
+            // Considerar 'pendiente' y también las que no tienen estado definido (legacy)
+            items = items.filter(i => !i.estado || i.estado === 'pendiente');
+        } else {
+            items = items.filter(i => i.estado === filterEstado);
+        }
     }
     
     if (filterSede !== 'all') {
@@ -381,31 +382,6 @@ async function renderDayTimeline(date) {
     cell.style.setProperty('--col-percent', `${colsPercent}%`);
   });
 
-  // marcador "ahora" (si es hoy) — header necesita incluir labelWidth en el left
-  const today = new Date();
-  const isToday = date.getFullYear() === today.getFullYear() &&
-              date.getMonth() === today.getMonth() &&
-              date.getDate() === today.getDate();
-  document.querySelectorAll('.now-marker').forEach(n => n.remove());
-  if (isToday) {
-    const nowHours = today.getHours() + today.getMinutes()/60;
-    if (nowHours >= CAL_HOUR_START && nowHours <= CAL_HOUR_END) {
-      const leftPctNow = ((nowHours - CAL_HOUR_START) / totalUnits) * 100;
-      // marker en header -> considerar labelWidth
-      const headerMarker = document.createElement('div');
-      headerMarker.className = 'now-marker';
-      headerMarker.style.left = `calc(${leftPctNow}% + ${labelWidth}px)`;
-      header.appendChild(headerMarker);
-      // marker en cada fila (sin offset)
-      document.querySelectorAll('.tr-cells').forEach(c => {
-        const m = document.createElement('div');
-        m.className = 'now-marker';
-        m.style.left = `${leftPctNow}%`;
-        c.appendChild(m);
-      });
-    }
-  }
-
   const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0,0,0);
   const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23,59,59);
 
@@ -630,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleBtn?.addEventListener('click', () => {
         // Si está colapsado, lo expandimos y reseteamos la vista de día.
         if (monthContainer.classList.contains('collapsed')) {
-            monthContainer.classList.remove('collapsed');
+            monthContainer.classList.remove('collapsed'); // Muestra el calendario
             selectDay(null); // Limpia la selección y el timeline
         } else {
             // Si está visible, simplemente lo colapsamos (acción de 'Ocultar').
@@ -678,6 +654,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listener para ordenar sedes
     document.getElementById('sortSedes')?.addEventListener('change', renderSedesList);
+
+    // Listeners para filtros de incidencias
+    document.getElementById('filterIncEstado')?.addEventListener('change', renderIncidenciasList);
+    document.getElementById('filterIncSede')?.addEventListener('change', renderIncidenciasList);
 
     // delegación de eventos en la lista (botones)
     const listContainer = document.getElementById('tecnicosList');
@@ -882,12 +862,9 @@ document.addEventListener('DOMContentLoaded', () => {
           opt.textContent = s.nombre;
           calSede.appendChild(opt);
         });
+        // Al cambiar la sede, solo refrescamos las vistas del calendario
         calSede.addEventListener('change', () => {
-          if (btnAutoAsignar) {
-            btnAutoAsignar.disabled = calSede.value === 'all';
-          }
           renderMonthCalendar(_calCurrent);
-          // evitar llamar renderDayTimeline con _selectedDay nulo
           if (_selectedDay) renderDayTimeline(_selectedDay);
         });
       }
@@ -908,32 +885,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de auto-asignación
     document.getElementById('btnAutoAsignar')?.addEventListener('click', async () => {
-        const sedeId = document.getElementById('calSede').value;
         const fecha = getSelectedDay();
 
-        if (sedeId === 'all') {
-            return alert('Por favor, selecciona una sede específica para la auto-asignación.');
-        }
-        if (!fecha) {
-            return alert('Por favor, selecciona un día en el calendario para realizar la asignación.');
-        }
+        // --- DEBUG ---
+        console.log('Botón "Auto-Asignar" pulsado. Valor de `fecha`:', fecha);
 
-        if (!confirm(`¿Deseas auto-asignar las incidencias pendientes para la sede seleccionada en la fecha ${fecha.toLocaleDateString()}?`)) {
+        if (!fecha) {
+            alert('Por favor, selecciona un día en el calendario para realizar la asignación.');
             return;
         }
+
+        if (!confirm(`¿Deseas auto-asignar las incidencias ya programadas para el día ${fecha.toLocaleDateString()}? Se asignará a cada una un técnico de su sede correspondiente.`)) return;
 
         try {
             const response = await fetch('/incidencias/auto-asignar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sedeId, fecha: fecha.toISOString() })
+                body: JSON.stringify({ fecha: fecha.toISOString() }) // Ya no se necesita sedeId
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Error en la auto-asignación');
             
             alert(`Proceso finalizado.\nAsignadas: ${result.asignadas.length}\nNo asignadas: ${result.noAsignadas.length}`);
-            await Promise.all([cargarIncidencias(), loadEventos()]);
-            renderDayTimeline(fecha);
+            // Recargar datos y refrescar la UI
+            // 1. Cargar las incidencias actualizadas (esto actualiza la lista de incidencias)
+            await cargarIncidencias(); 
+            // 2. Cargar los eventos del calendario (que se basan en las incidencias)
+            await loadEventos();
+            // 3. Volver a renderizar la línea de tiempo para el día seleccionado
+            renderDayTimeline(getSelectedDay());
         } catch (error) {
             alert(`Error: ${error.message}`);
         }
@@ -1026,23 +1006,29 @@ document.addEventListener('DOMContentLoaded', () => {
         monthContainer?.classList.remove('collapsed');
         toggleBtn && (toggleBtn.style.display = 'none');
         renderDayTimeline(null); // Limpia el timeline
-        return;
       }
-
 
       // highlight selected cell
       document.querySelectorAll('.mc-day.selected').forEach(e => e.classList.remove('selected'));
-      const isoLocal = formatLocalDateKey(date);
-      const cell = document.querySelector(`.mc-day[data-date="${isoLocal}"]`);
-      cell && cell.classList.add('selected');
+      if (date) {
+        const isoLocal = formatLocalDateKey(date);
+        const cell = document.querySelector(`.mc-day[data-date="${isoLocal}"]`);
+        cell && cell.classList.add('selected');
+      }
 
       // render timeline
       renderDayTimeline(date);
 
-      // Colapsar calendario y mostrar botón
-      monthContainer?.classList.add('collapsed');
-      toggleBtn && (toggleBtn.style.display = 'inline-flex');
-      toggleBtn && (toggleBtn.textContent = 'Mostrar Calendario');
+      // Colapsar calendario y mostrar botón si hay fecha
+      if (date) {
+        monthContainer?.classList.add('collapsed');
+        toggleBtn && (toggleBtn.style.display = 'inline-flex');
+        toggleBtn && (toggleBtn.textContent = 'Mostrar Calendario');
+      }
+
+      // Habilitar/deshabilitar el botón de auto-asignación
+      const btnAutoAsignar = document.getElementById('btnAutoAsignar');
+      if (btnAutoAsignar) btnAutoAsignar.disabled = !date;
     }
 
     document.getElementById('incidenciaForm')?.addEventListener('submit', async (e) => {

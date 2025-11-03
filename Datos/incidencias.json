@@ -65,13 +65,13 @@
       "titulo": "Incidencia Demo1",
       "descripcion": "asdlaksjdhalks",
       "sedeId": "s_mhc8g5eb",
-      "tecnicoId": null,
-      "estado": "programada",
+      "tecnicoId": "t_mhc8h4fq_656",
+      "estado": "asignada",
       "prioridad": "alta",
-      "fechaInicio": "2025-10-31T10:00",
+      "fechaInicio": "2025-10-31T09:00:00.000Z",
       "duracionHoras": 2,
       "createdAt": "2025-10-29T16:51:56.824Z",
-      "updatedAt": "2025-10-31T19:09:05.003Z",
+      "updatedAt": "2025-11-03T11:37:34.337Z",
       "duracionEstimadaHoras": 2,
       "fechaLimite": null
     },
@@ -122,14 +122,14 @@
       "titulo": "Inci larga 1",
       "descripcion": "asdfasda",
       "sedeId": "s_2",
-      "tecnicoId": null,
-      "estado": "pendiente",
+      "tecnicoId": "2",
+      "estado": "asignada",
       "prioridad": "alta",
-      "fechaInicio": null,
+      "fechaInicio": "2025-11-03T11:15:00.000Z",
       "duracionEstimadaHoras": 3,
       "fechaLimite": null,
       "createdAt": "2025-10-31T19:30:43.713Z",
-      "updatedAt": "2025-11-02T15:44:17.978Z"
+      "updatedAt": "2025-11-03T11:29:22.391Z"
     }
   ]
 }

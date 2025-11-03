@@ -87,6 +87,12 @@ button{
 
 button:hover{transform:translateY(-2px);opacity:0.98}
 button:active{transform:translateY(0)}
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
 
 /* List */
 .list-container h2{margin-bottom:10px}
@@ -333,27 +339,6 @@ textarea {
 .tr-cells.drag-over {
     background-color: rgba(59, 130, 246, 0.1); /* Resalta la fila objetivo */
     border: 1px dashed var(--accent);
-}
-
-/* Marcador de hora actual en el timeline */
-.now-marker {
-  position: absolute;
-  top: -4px; /* Ligeramente por encima para que el círculo no choque */
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  z-index: 10;
-  pointer-events: none;
-  box-shadow: 0 0 12px rgba(59,130,246,0.5);
-}
-
-.now-marker::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
 }
 
 /* header como grid para alinear columnas */

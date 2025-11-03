@@ -106,8 +106,8 @@ app.post('/incidencias/:id/cancelar', async (req, res) => {
 
 app.post('/incidencias/auto-asignar', async (req, res) => {
     try {
-        const { sedeId, fecha } = req.body;
-        if (!sedeId || !fecha) return res.status(400).json({ error: 'Se requiere sedeId y fecha' });
+        const { fecha, sedeId } = req.body; // sedeId es ahora opcional
+        if (!fecha) return res.status(400).json({ error: 'Se requiere una fecha' });
         const result = await incidenciasModule.autoAsignarIncidencias(sedeId, fecha);
         return res.json(result);
     } catch (err) {
