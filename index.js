@@ -5,6 +5,7 @@ const sedesModule = require('./modules/sedesModule');
 const incidenciasModule = require('./modules/incidenciasModule');
 const calendarioModule = require('./modules/calendarioModule');
 const path = require('path');
+const hiddenApiRoutes = require('./routes/hiddenApiRoutes');
 const fs = require('fs').promises;
 const app = express();
 const port = 3000;
@@ -12,6 +13,9 @@ const port = 3000;
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Rutas de la API oculta/interna ---
+app.use('/hidden/api', hiddenApiRoutes);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));

@@ -130,6 +130,34 @@
       "fechaLimite": null,
       "createdAt": "2025-10-31T19:30:43.713Z",
       "updatedAt": "2025-11-03T11:29:22.391Z"
+    },
+    {
+      "id": "inc_mhl5q6n2",
+      "titulo": "Fallo en el sistema de tickets",
+      "descripcion": "El sistema no permite cerrar tickets desde las 11:00 AM.",
+      "sedeId": "s_2",
+      "tecnicoId": null,
+      "estado": "cancelada",
+      "prioridad": "alta",
+      "fechaInicio": null,
+      "duracionEstimadaHoras": 3,
+      "fechaLimite": null,
+      "createdAt": "2025-11-04T22:45:19.262Z",
+      "updatedAt": "2025-11-04T22:46:36.235Z"
+    },
+    {
+      "id": "inc_mhl5s6y0",
+      "titulo": "Fallo en la maquina X",
+      "descripcion": "asdasdasdas",
+      "sedeId": "s_2",
+      "tecnicoId": null,
+      "estado": "pendiente",
+      "prioridad": "alta",
+      "fechaInicio": null,
+      "duracionEstimadaHoras": 3,
+      "fechaLimite": null,
+      "createdAt": "2025-11-04T22:46:52.968Z",
+      "updatedAt": "2025-11-04T22:46:52.968Z"
     }
   ]
 }
