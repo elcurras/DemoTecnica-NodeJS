@@ -150,14 +150,28 @@
       "titulo": "Fallo en la maquina X",
       "descripcion": "asdasdasdas",
       "sedeId": "s_2",
+      "tecnicoId": "2",
+      "estado": "asignada",
+      "prioridad": "alta",
+      "fechaInicio": "2025-11-05T08:00:00.000Z",
+      "duracionEstimadaHoras": 3,
+      "fechaLimite": null,
+      "createdAt": "2025-11-04T22:46:52.968Z",
+      "updatedAt": "2025-11-04T23:18:35.457Z"
+    },
+    {
+      "id": "inc_mhl6xsmd",
+      "titulo": "Fallo en la maquina Xx1",
+      "descripcion": "asdasdasdas",
+      "sedeId": "s_1",
       "tecnicoId": null,
       "estado": "pendiente",
       "prioridad": "alta",
       "fechaInicio": null,
       "duracionEstimadaHoras": 3,
       "fechaLimite": null,
-      "createdAt": "2025-11-04T22:46:52.968Z",
-      "updatedAt": "2025-11-04T22:46:52.968Z"
+      "createdAt": "2025-11-04T23:19:13.957Z",
+      "updatedAt": "2025-11-04T23:19:13.957Z"
     }
   ]
 }

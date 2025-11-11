@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "44a273ac-110f-41f7-a7a5-7761689b2890",
+		"name": "API DEMO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29255780"
+	},
+	"item": [
+		{
+			"name": "Incidencias",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"titulo\": \"Fallo en la maquina X\",\r\n    \"descripcion\": \"asdasdasdas\",\r\n    \"sedeNombre\": \"Sede Centro 2\",\r\n    \"prioridad\": \"alta\",\r\n    \"duracionEstimadaHoras\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{%%URL%%}}hidden/api/incidencias"
+			},
+			"response": []
+		},
+		{
+			"name": "Tecnicos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{%%URL%%}}hidden/api/tecnicos"
+			},
+			"response": []
+		},
+		{
+			"name": "TecnicosSede",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
